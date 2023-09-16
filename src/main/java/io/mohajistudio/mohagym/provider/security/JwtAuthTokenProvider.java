@@ -34,6 +34,10 @@ public class JwtAuthTokenProvider implements AuthTokenProvider<JwtAuthToken> {
         return new JwtAuthToken(token, key);
     }
 
+    public String getUserIdFromToken(String token){
+        JwtAuthToken jwtAuthToken = convertAuthToken(token);
+        return jwtAuthToken.userIdFromClaim();
+    }
 
     @Override
     public Optional<String> getAuthToken(HttpServletRequest request) {

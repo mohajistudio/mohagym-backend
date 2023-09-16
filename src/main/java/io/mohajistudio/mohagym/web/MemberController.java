@@ -5,6 +5,7 @@ import io.mohajistudio.mohagym.web.dto.ResponseMember;
 import io.mohajistudio.mohagym.web.dto.ResponseMessage;
 import io.mohajistudio.mohagym.web.dto.requestMember;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,11 +52,11 @@ public class MemberController {
                     .build());
     }
 
-
-
-    @GetMapping("/test")
-    public String main(){
-            log.info("테스트 url");
-            return "OK";
+    @GetMapping("/logout")
+    public ResponseEntity<ResponseMessage> logout(HttpServletRequest request){
+        memberService.logout(request);
+        return ResponseEntity.ok().body(ResponseMessage.builder()
+                .message("로그아웃 완료")
+                .build());
     }
 }

@@ -11,6 +11,7 @@ import io.mohajistudio.mohagym.util.SHA256Util;
 import io.mohajistudio.mohagym.web.dto.ResponseMember;
 import io.mohajistudio.mohagym.web.dto.requestMember;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Optional;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class MemberServiceImpl implements MemberService  {
 
     private final MemberRepository memberRepository;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
+
 
     //회원가입 로직
     @Transactional
@@ -55,14 +58,14 @@ public class MemberServiceImpl implements MemberService  {
     public ResponseMember.Token login(requestMember requestDto) {
         Member member = memberRepository.findByUserId(requestDto.getUserId());
         if (member == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_ADMIN);
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         //솔트 꺼내기
         String salt = member.getSalt();
         member = memberRepository.findByUserIdAndPassword(requestDto.getUserId(),
                 SHA256Util.getEncrypt(requestDto.getPassword(), salt));
         if (member == null) {//비밀번호가 틀렸을 경우
-            throw new CustomException(ErrorCode.NOT_FOUND_ADMIN);
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         //로그인 성공
         String refreshToken = createRefreshToken(member.getUserId(),member.getRole());
@@ -82,7 +85,7 @@ public class MemberServiceImpl implements MemberService  {
         //바꾸려는 사용자의 정보 조회(역할 조회)
         Member member = memberRepository.findByUserId(requestDto.getUserId());
         if (member == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_ADMIN);
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         //역할 바꾸는 로직(어드민->일반, 일반->어드민)
@@ -99,7 +102,18 @@ public class MemberServiceImpl implements MemberService  {
          memberRepository.save(member);
         return Role.findByCode(member.getRole()).getDescription();
     }
-    //로그아웃로직//db에서 refresh 토큰 삭제
+    //로그아웃 로직
+    @Transactional
+    @Override
+    public void logout(HttpServletRequest request){
+        String token = jwtAuthTokenProvider.getAuthToken(request).get();
+        Member member = memberRepository.findByUserId(jwtAuthTokenProvider.getUserIdFromToken(token));
+        if (member == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        member.setRefreshToken(null);
+        memberRepository.save(member);
+    }
     public String createAccessToken(String userId,String role) {
         Date expiredDate = Date.from(LocalDateTime.now().plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 1시간을 더한 시간을 만들어서 만료 날짜를 설정
         JwtAuthToken accessToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);

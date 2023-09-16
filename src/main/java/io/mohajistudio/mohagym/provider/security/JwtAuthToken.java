@@ -45,6 +45,11 @@ public class JwtAuthToken implements AuthToken<Claims> {
         return  claims.get(AUTHORITIES_KEY,String.class);
     }
 
+    public String userIdFromClaim(){
+        Claims claims = getClaims();
+        return claims.getSubject();
+    }
+
     @Override
     public boolean validate() {
         return getClaims() != null; //클레임 정보를 호출하는 메서드를 실행하여 null 이면 false 존재하면 true반환
