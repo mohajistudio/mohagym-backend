@@ -40,6 +40,11 @@ public class JwtAuthToken implements AuthToken<Claims> {
                 .setExpiration(expiredDate)// 토큰의 만료 날짜 설정
                 .compact(); //토큰을 문자열로 변환하고 반환
     }
+    public String roleFromClaim(){
+        Claims claims = getClaims();
+        return  claims.get(AUTHORITIES_KEY,String.class);
+    }
+
     @Override
     public boolean validate() {
         return getClaims() != null; //클레임 정보를 호출하는 메서드를 실행하여 null 이면 false 존재하면 true반환
@@ -56,7 +61,7 @@ public class JwtAuthToken implements AuthToken<Claims> {
                 반환된 객체에서 다음과 같은 정보를 가져와 사용할 수 있다.
                 Claims claims = getClaims();
                 String userId = claims.getSubject(); // 사용자 ID
-                String role = (String) claims.get("AUTHORITIES_KEY"); // 역할
+                String role =  claims.get("AUTHORITIES_KEY"); // 역할
                 Date expirationDate = claims.getExpiration(); // 만료 날짜
                 */
         try {

@@ -5,12 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+
 @Entity
 @Getter
 @Setter
 //클래스 내부에 생성자가 존재할때 기본생성자 자동으로 생성//싱글톤 유지
 @NoArgsConstructor
-public class Member {
+
+public class Member  {
     @Id
     /*원하면 SEQUENCE 로 변경 가능(창희형)//oracle 데이터베이스 등에서 사용가능하며 id 값이
     증가하는 IDENTITY 와 다르게 조정이 가능하지만 인스턴스가 생성되거나 삭제될때 아이디 값을 관리하는 별도의 로직이 필요함*/
@@ -29,6 +32,7 @@ public class Member {
     //SHA256Util 클래스의 설명 참조
     @Column(name = "salt")
     private String salt;
+
 
     /*
     1.장기적인 인증 유지: 인증된 사용자나 클라이언트가 로그인 상태를 유지하거나, 액세스 토큰(Access Token)의 만료 시간이 지날 때 다시 로그인하지 않고도 자원에 접근할 수 있게 합니다.
@@ -56,6 +60,7 @@ public class Member {
     //생성자//id는 IDENTITY로 자동생성//refreshToken은 changeRefreshToken 매서드로 받아옴//Builder 패턴으로 사용하는 다른 코드의 가독성 높임
     @Builder
     public Member(String userId, String password, String salt, String role){
+
         this.userId = userId;
         this.password = password;
         this.salt = salt;

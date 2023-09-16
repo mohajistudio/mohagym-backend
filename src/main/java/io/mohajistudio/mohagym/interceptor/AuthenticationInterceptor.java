@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class AuthInterceptor implements HandlerInterceptor {
+public class AuthenticationInterceptor implements HandlerInterceptor {
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
 
     //요청이 처리되기 전에 실행되는 메서드
