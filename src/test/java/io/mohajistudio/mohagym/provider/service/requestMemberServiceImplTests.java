@@ -3,10 +3,9 @@ package io.mohajistudio.mohagym.provider.service;
 import io.mohajistudio.mohagym.core.security.role.Role;
 import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.repository.MemberRepository;
-import io.mohajistudio.mohagym.web.dto.ResponseMember;
+import io.mohajistudio.mohagym.web.dto.responseMember;
 import io.mohajistudio.mohagym.web.dto.requestMember;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
-import jakarta.servlet.http.HttpServletRequest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class requsetMemberServiceImplTests {
+public class requestMemberServiceImplTests {
 
     @Autowired
     private MemberServiceImpl memberServiceImpl;
@@ -53,7 +52,7 @@ public class requsetMemberServiceImplTests {
                 .build();
         memberServiceImpl.register(request);
         //로그인
-        ResponseMember.Token token = memberServiceImpl.login(request);
+        responseMember token = memberServiceImpl.login(request);
         assertNotNull(token);
     }
 
@@ -98,8 +97,7 @@ public class requsetMemberServiceImplTests {
                 .build();
         memberServiceImpl.register(request);
         //로그인
-        ResponseMember.Token token = memberServiceImpl.login(request);
-        System.out.println("로그아웃 전 RefreshToken = " + token.getRefreshToken());
+        responseMember token = memberServiceImpl.login(request);
         //로그아웃
         //목 MockHttpServletRequest 객체 설정
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
