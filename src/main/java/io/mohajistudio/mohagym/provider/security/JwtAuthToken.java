@@ -79,7 +79,7 @@ public class JwtAuthToken implements AuthToken<Claims> {
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token.");
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token");
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);

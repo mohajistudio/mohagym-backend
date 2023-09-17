@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthTokenProvider implements AuthTokenProvider<JwtAuthToken> {
     //HTTP 요청 헤더에 포함되는 헤더 필드의 이름
-    private static final String AUTHORIZATION_HEADER = "x-auth-token";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
     private final Key key;
 
     public JwtAuthTokenProvider(String secret){

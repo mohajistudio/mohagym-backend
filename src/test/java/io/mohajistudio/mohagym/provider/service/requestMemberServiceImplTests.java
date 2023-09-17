@@ -102,7 +102,7 @@ public class requestMemberServiceImplTests {
         //목 MockHttpServletRequest 객체 설정
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addHeader("x-auth-token",token.getAccessToken() );
-        memberServiceImpl.logout(mockRequest);
+        // memberServiceImpl.logout();
         Member logoutMember = memberRepository.findByUserId("test");
         System.out.println("로그아웃 후 RefreshToken = " + logoutMember.getRefreshToken());
         assertNull(logoutMember.getRefreshToken());

@@ -1,6 +1,7 @@
 package io.mohajistudio.mohagym.provider.service;
 
 
+import io.mohajistudio.mohagym.web.dto.requestToken;
 import io.mohajistudio.mohagym.web.dto.responseMember;
 import io.mohajistudio.mohagym.web.dto.requestMember;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
@@ -12,6 +13,6 @@ public interface MemberService {
     responseMember login(requestMember requestDto);
     String changeRole(requestUserId requestDto );
 
-    void logout(HttpServletRequest request);
-    responseMember reissueToken(HttpServletRequest request);
+    void logout(requestToken token);
+    responseMember reissueToken(requestToken oldTokens);
 }

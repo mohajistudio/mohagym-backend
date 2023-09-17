@@ -8,6 +8,7 @@ import io.mohajistudio.mohagym.provider.security.JwtAuthToken;
 import io.mohajistudio.mohagym.provider.security.JwtAuthTokenProvider;
 import io.mohajistudio.mohagym.repository.MemberRepository;
 import io.mohajistudio.mohagym.util.SHA256Util;
+import io.mohajistudio.mohagym.web.dto.requestToken;
 import io.mohajistudio.mohagym.web.dto.responseMember;
 import io.mohajistudio.mohagym.web.dto.requestMember;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
@@ -71,6 +72,7 @@ public class MemberServiceImpl implements MemberService  {
         String refreshToken = createRefreshToken(member.getUserId(),member.getRole());
         responseMember login = responseMember.builder()
                 .accessToken(createAccessToken(member.getUserId(), member.getRole()))
+                .refreshToken(refreshToken)
                 .build();
         //refreshToken 업데이트
         member.setRefreshToken(refreshToken);
@@ -101,12 +103,12 @@ public class MemberServiceImpl implements MemberService  {
          memberRepository.save(member);
         return Role.findByCode(member.getRole()).getDescription();
     }
-    //로그아웃 로직
+    //로그아웃 로직//dto를 사용하도록 변경
     @Transactional
     @Override
-    public void logout(HttpServletRequest request){
-        String token = jwtAuthTokenProvider.getAuthToken(request).get();
-        Member member = memberRepository.findByUserId(jwtAuthTokenProvider.getUserIdFromToken(token));
+    public void logout(requestToken token){
+
+        Member member = memberRepository.findByUserId(jwtAuthTokenProvider.getUserIdFromToken(token.getAccessToken()));
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
@@ -115,36 +117,38 @@ public class MemberServiceImpl implements MemberService  {
     }
 
     //토큰 재발급//엑세스 토큰이 만료되었을 때
+    //참고 블로그
+    //https://velog.io/@myway00/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8-%EB%A6%AC%EC%95%A1%ED%8A%B8-jwt-%ED%86%A0%ED%81%B0-%EC%84%A4%EC%A0%95%EB%B0%A9%EB%B2%95
     @Transactional
     @Override
-    public responseMember reissueToken(HttpServletRequest request){
+    public responseMember reissueToken(requestToken oldTokens){
+        Member member = memberRepository.findByRefreshToken(oldTokens.getRefreshToken());
 
-        String token = jwtAuthTokenProvider.getAuthToken(request).get();
-        Member member = memberRepository.findByUserId(jwtAuthTokenProvider.getUserIdFromToken(token));
+        if(jwtAuthTokenProvider.convertAuthToken(oldTokens.getRefreshToken()).validate()){//refresh토큰 유효성 조사
 
-       String refreshToken = member.getRefreshToken();
-        JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(refreshToken);
-       if(refreshToken==null){
-           return null;
-       }
+        //refreshToken 업데이트//RTR방식
+        String refreshToken = createRefreshToken(member.getUserId(),member.getRole());
+        //accessToken 재발급
+        responseMember  newTokens = responseMember.builder()
+                .accessToken(createAccessToken(member.getUserId(), member.getRole()))
+                .refreshToken(refreshToken)
+                .build();
 
-       else if(jwtAuthToken.isNotExpired()&&jwtAuthToken.validate()){
-           //accessToken 재발급
-           responseMember  reissue = responseMember.builder()
-                   .accessToken(createAccessToken(member.getUserId(), member.getRole()))
-                   .build();
-           //refreshToken 업데이트//RTR방식
-           refreshToken = createRefreshToken(member.getUserId(),member.getRole());
-           member.setRefreshToken(refreshToken);
+        member.setRefreshToken(refreshToken);
+        memberRepository.save(member);
 
-           return reissue;
-            }
-       logout(request);
-        return null;
+
+        return newTokens;
+        }
+        //refresh토큰 이 유효하지 않으면 강제 로그아웃
+        member.setRefreshToken(null);
+        memberRepository.save(member);
+        throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
 
     }
+
     private String createAccessToken(String userId,String role) {
-        Date expiredDate = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 1시간을 더한 시간을 만들어서 만료 날짜를 설정
+        Date expiredDate = Date.from(LocalDateTime.now().plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 1시간을 더한 시간을 만들어서 만료 날짜를 설정
         JwtAuthToken accessToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);
         return accessToken.getToken();
     }
