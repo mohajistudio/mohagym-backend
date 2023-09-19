@@ -8,11 +8,10 @@ import io.mohajistudio.mohagym.provider.security.JwtAuthToken;
 import io.mohajistudio.mohagym.provider.security.JwtAuthTokenProvider;
 import io.mohajistudio.mohagym.repository.MemberRepository;
 import io.mohajistudio.mohagym.util.SHA256Util;
-import io.mohajistudio.mohagym.web.dto.requestToken;
-import io.mohajistudio.mohagym.web.dto.responseMember;
 import io.mohajistudio.mohagym.web.dto.requestMember;
+import io.mohajistudio.mohagym.web.dto.requestToken;
 import io.mohajistudio.mohagym.web.dto.requestUserId;
-import jakarta.servlet.http.HttpServletRequest;
+import io.mohajistudio.mohagym.web.dto.responseMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class MemberServiceImpl implements MemberService  {
     public void register(requestMember requestDto) {
         Member member = memberRepository.findByUserId(requestDto.getUserId());
         if (member != null) { //아이디 중복
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+            throw new CustomException(ErrorCode.AUTHENTICATION_CONFLICT);
         }
         //salt 생성
         String salt = SHA256Util.generateSalt();
