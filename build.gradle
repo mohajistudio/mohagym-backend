@@ -3,6 +3,14 @@ plugins {
 	id 'org.springframework.boot' version '3.1.3'
 	id 'io.spring.dependency-management' version '1.1.3'
 }
+//Deprecated 경고를 확인하고 수정
+allprojects {
+	gradle.projectsEvaluated {
+		tasks.withType(JavaCompile) {
+			options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+		}
+	}
+}
 
 group = 'io.mohajistudio'
 version = '0.0.1-SNAPSHOT'
@@ -23,13 +31,21 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-// JWT Token
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	runtimeOnly 'com.h2database:h2'
+	//jwt 의존성
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	//spring sequrity 의존성 추가
+
+	//implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {

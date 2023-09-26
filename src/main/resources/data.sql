@@ -1,0 +1,1 @@
+INSERT INTO member (id ,user_id, password, salt, role, refresh_token) VALUES (0L, 'testAdmin', '8031bbe0bbc3db55f47cc7524677fd623dacff2ea15add88cd59cf74aedf8185', 'deb82cc87893431a', 'ROLE_ADMIN', null)
