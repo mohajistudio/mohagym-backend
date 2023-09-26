@@ -4,6 +4,16 @@ public class Member {
     private Long id;
     private String name;
 
+    public String  getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    private String phoneNumber;
+
     public Member() {
     }
 
@@ -24,8 +34,7 @@ public class Member {
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
-
-
 }
