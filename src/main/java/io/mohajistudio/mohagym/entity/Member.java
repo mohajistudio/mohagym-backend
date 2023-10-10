@@ -1,6 +1,7 @@
 package io.mohajistudio.mohagym.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,10 +11,13 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "members")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class Member extends BaseEntity {
     private String email;
     private String password;
+    private String role;
+    private String salt;
+    private String refreshToken;
 
     @OneToOne(mappedBy = "member")
     private MemberProfile memberProfile;
