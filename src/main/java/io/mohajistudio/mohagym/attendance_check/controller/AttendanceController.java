@@ -1,41 +1,31 @@
 package io.mohajistudio.mohagym.attendance_check.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
+import io.mohajistudio.mohagym.attendance_check.service.AttendanceServiceInterface;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.mohajistudio.mohagym.attendance_check.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Controller
+
+@Slf4j
+@RestController
 public class AttendanceController {
-    private final MemberService memberService;
 
-    @Autowired
-    public AttendanceController(MemberService memberService) {
-        this.memberService = memberService;
+    private final AttendanceServiceInterface attendanceServiceInterface;
+
+    public AttendanceController(AttendanceServiceInterface attendanceServiceInterface) {
+        this.attendanceServiceInterface = attendanceServiceInterface;
     }
 
-    @GetMapping("/attendance")
-    public String attendanceForm() {
-        System.out.println("잘 넘어오네");
-        return "test";
+
+
+    //id 조회
+    @GetMapping("/members/check/{id}")
+    public ResponseEntity<String> checkId(@PathVariable Long id) {
+        return attendanceServiceInterface.checkId(id);
     }
 
-    @PostMapping("/check-attendance")
-    public String checkAttendance(@RequestParam String name, Model model) {
-        boolean result = memberService.checkAttendance(name);
-        if (result) {
-            model.addAttribute("message", "출석체크 성공");
-        } else {
-            model.addAttribute("message", "회원이 존재하지 않습니다.");
-        }
-        System.out.println("결과 넘어오나");
-        return "result";
-    }
 
-    @ExceptionHandler(Exception.class)
-    public String handleException(Exception ex) {
 
-        return "error";
-    }
+
 }

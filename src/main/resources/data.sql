@@ -1,1 +1,2 @@
-INSERT INTO member (id ,user_id, password, salt, role, refresh_token) VALUES (0L, 'testAdmin', '8031bbe0bbc3db55f47cc7524677fd623dacff2ea15add88cd59cf74aedf8185', 'deb82cc87893431a', 'ROLE_ADMIN', null)
+INSERT INTO member (id ,user_id, password, salt, role, refresh_token) VALUES (0, 'testAdmin', '8031bbe0bbc3db55f47cc7524677fd623dacff2ea15add88cd59cf74aedf8185', 'deb82cc87893431a', 'ROLE_ADMIN', null);
+INSERT INTO member (id ,user_id, password, salt, role, refresh_token) VALUES (1,'최영민','9a0f2359ed589398ed066db66406311ec115cf6fd75345fba6333ee753471f8c', '823479bc87daff6f','ROLE_USER',null);

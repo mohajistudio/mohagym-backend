@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class requestMemberServiceImplTests {
+public class requestAttendanceServiceImplTests {
 
     @Autowired
     private MemberServiceImpl memberServiceImpl;
