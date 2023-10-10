@@ -67,5 +67,4 @@ public class Member  {
         this.role = role;
     }
 
-
 }
