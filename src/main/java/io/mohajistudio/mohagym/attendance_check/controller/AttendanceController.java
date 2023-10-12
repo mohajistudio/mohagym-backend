@@ -20,7 +20,7 @@ public class AttendanceController {
 
 
     //id 조회
-    @GetMapping("/members/check/{id}")
+    @PostMapping("/members/check/{id}")
     public ResponseEntity<String> checkId(@PathVariable Long id) {
         return attendanceServiceInterface.checkId(id);
     }
