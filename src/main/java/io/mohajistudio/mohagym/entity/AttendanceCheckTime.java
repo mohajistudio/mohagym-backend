@@ -18,4 +18,8 @@ public class AttendanceCheckTime {
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 }

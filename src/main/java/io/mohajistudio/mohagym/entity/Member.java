@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 
 
 @Entity
@@ -13,7 +14,7 @@ import lombok.Setter;
 //클래스 내부에 생성자가 존재할때 기본생성자 자동으로 생성//싱글톤 유지
 @NoArgsConstructor
 
-public class Member  {
+public class Member {
     @Id
     /*원하면 SEQUENCE 로 변경 가능(창희형)//oracle 데이터베이스 등에서 사용가능하며 id 값이
     증가하는 IDENTITY 와 다르게 조정이 가능하지만 인스턴스가 생성되거나 삭제될때 아이디 값을 관리하는 별도의 로직이 필요함*/
@@ -23,7 +24,7 @@ public class Member  {
     @Column(name = "user_id")
     private String userId;
 
-    @Column(name="password")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "role")
@@ -54,12 +55,12 @@ public class Member  {
 
     이러한 방식으로 Refresh token을 사용하면 사용자는 로그인 세션을 유지하고, 액세스 토큰의 만료로 인한 불편함 없이 서비스를 계속 이용할 수 있습니다.
      Refresh token은 보안적으로 중요한 개념이며, 안전하게 관리되어야 합니다.*/
-    @Column(name ="refreshToken")
+    @Column(name = "refreshToken")
     private String refreshToken;
 
     //생성자//id는 IDENTITY로 자동생성//refreshToken은 changeRefreshToken 매서드로 받아옴//Builder 패턴으로 사용하는 다른 코드의 가독성 높임
     @Builder
-    public Member(String userId, String password, String salt, String role){
+    public Member(String userId, String password, String salt, String role) {
 
         this.userId = userId;
         this.password = password;
@@ -67,4 +68,6 @@ public class Member  {
         this.role = role;
     }
 
+    @OneToMany(mappedBy = "member")
+    private List<AttendanceCheckTime> attendanceCheckTimes;
 }

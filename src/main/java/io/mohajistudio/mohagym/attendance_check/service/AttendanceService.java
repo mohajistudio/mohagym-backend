@@ -33,7 +33,6 @@ public class AttendanceService implements AttendanceServiceInterface {
     }
 
 
-
     @ResponseBody
     public ResponseEntity<String> checkId(Long id) {
         Optional<Member> memberEntity = memberRepository.findById(id);
@@ -44,7 +43,7 @@ public class AttendanceService implements AttendanceServiceInterface {
             AttendanceCheckTime attendanceCheckTime = new AttendanceCheckTime();
             attendanceCheckTime.setCreatedAt(LocalDateTime.now());
 
-            // AttendanceCheckTime 엔티티를 저장
+            attendanceCheckTime.setMember(member);
             attendanceCheckTimeRepository.save(attendanceCheckTime);
 
             response.put("status", "success");
@@ -56,6 +55,5 @@ public class AttendanceService implements AttendanceServiceInterface {
             return ResponseEntity.notFound().build();
         }
     }
-
 
 }
