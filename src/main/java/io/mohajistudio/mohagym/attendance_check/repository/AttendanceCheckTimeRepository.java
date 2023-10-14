@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface AttendanceCheckTimeRepository extends JpaRepository<AttendanceCheckTime, Long> {
-    AttendanceCheckTime findByCreatedAt(LocalDateTime createdAt);
+    List<AttendanceCheckTime> findByMemberIdAndCreatedAtBetween(Long member, LocalDateTime startDate, LocalDateTime endDate);
 }

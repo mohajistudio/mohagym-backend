@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AttendanceDTO {
-    private Long id;
+    private Long memberId;
     private LocalDateTime createdAt;
 
     public AttendanceDTO() {

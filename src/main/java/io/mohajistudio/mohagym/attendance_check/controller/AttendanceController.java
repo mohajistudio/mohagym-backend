@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @Slf4j
 @RestController
@@ -26,10 +28,15 @@ public class AttendanceController {
     }
 
 
-    @GetMapping("/members/:memberId/attendance-checks/{id}")
-    public ResponseEntity<String> attendanceRecord(@PathVariable Long id) {
-        return attendanceService.attendanceRecord(id);
+    @GetMapping("/members/{memberId}/attendance-checks/{id}/{year}/{month}")
+    public ResponseEntity<List<AttendanceDTO>> attendanceRecord(
+            @PathVariable Long id,
+            @PathVariable int year,
+            @PathVariable int month) {
+        ResponseEntity<List<AttendanceDTO>> response = attendanceService.attendanceRecord(id, year, month);
+        return ResponseEntity.ok(response.getBody());
     }
+
 
 
 }

@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AttendanceService {
@@ -38,7 +36,7 @@ public class AttendanceService {
             AttendanceCheckTime savedAttendanceCheckTime = attendanceCheckTimeRepository.save(attendanceCheckTime);
 
             AttendanceDTO attendanceDTO = new AttendanceDTO();
-            attendanceDTO.setId(savedAttendanceCheckTime.getId());
+            attendanceDTO.setMemberId(savedAttendanceCheckTime.getId());
             attendanceDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
 
             response.put("status", "success");
@@ -51,7 +49,27 @@ public class AttendanceService {
     }
 
     @ResponseBody
-    public ResponseEntity<String> attendanceRecord(Long id) {
-        return null;
+    public ResponseEntity<List<AttendanceDTO>> attendanceRecord(Long memberId, int year, int month) {
+        Optional<Member> memberEntity = memberRepository.findById(memberId);
+        if (memberEntity.isPresent()) {
+            LocalDateTime startDateTime = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime endDateTime = startDateTime.plusMonths(1).minusNanos(1);
+
+            List<AttendanceCheckTime> attendanceCheckTimes = attendanceCheckTimeRepository.findByMemberIdAndCreatedAtBetween(memberId, startDateTime, endDateTime);
+
+
+            List<AttendanceDTO> attendanceDTOList = new ArrayList<>();
+            for (AttendanceCheckTime attendanceCheckTime : attendanceCheckTimes) {
+                AttendanceDTO attendanceDTO = new AttendanceDTO();
+
+                attendanceDTO.setMemberId(attendanceCheckTime.getId());
+                attendanceDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
+                attendanceDTOList.add(attendanceDTO);
+            }
+
+            return ResponseEntity.ok(attendanceDTOList);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
