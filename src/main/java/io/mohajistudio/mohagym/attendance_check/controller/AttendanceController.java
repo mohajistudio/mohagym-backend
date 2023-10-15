@@ -33,8 +33,7 @@ public class AttendanceController {
             @PathVariable Long id,
             @PathVariable int year,
             @PathVariable int month) {
-        ResponseEntity<List<AttendanceDTO>> response = attendanceService.attendanceRecord(id, year, month);
-        return ResponseEntity.ok(response.getBody());
+        return attendanceService.attendanceRecord(id, year, month);
     }
 
 
