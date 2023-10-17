@@ -2,7 +2,6 @@ package io.mohajistudio.mohagym.provider.service;
 
 
 import io.mohajistudio.mohagym.entity.Member;
-import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.web.dto.requestDto;
 import io.mohajistudio.mohagym.web.dto.requestProfile;
 import io.mohajistudio.mohagym.web.dto.requestToken;
@@ -24,9 +23,11 @@ public interface MemberService {
     Page<Member> getAllMembers(int page, int size);
     //이름으로 회원 검색
     Page<Member> getMemberByName(int page, int size, String name);
+
     //멤버 아이디로 멤버 프로필 가져와서 보여주기
-     MemberProfile getMemberProfileById(Long Id);
+   /*  MemberProfile getMemberProfileById(Long Id);*/
     //회원 탈퇴
+
     void disableMember(Long Id);
 
     //회원 정보 수정

@@ -91,7 +91,7 @@ public class MemberServiceImpl implements MemberService  {
                 .refreshToken(refreshToken)
                 .build();
         //refreshToken 업데이트
-        member.setRefreshToken(refreshToken);
+        member.updateRefreshToken(refreshToken);
 
         return login;
     }
@@ -108,14 +108,14 @@ public class MemberServiceImpl implements MemberService  {
 
         //역할 바꾸는 로직(어드민->일반, 일반->어드민)
         if(member.getRole().equals( Role.USER.getCode())){
-            member.setRole(Role.ADMIN.getCode());
+            member.updateRole(Role.ADMIN.getCode());
         }
         else{
-        member.setRole(Role.USER.getCode());}
+        member.updateRole(Role.USER.getCode());}
         //refreshToken 업데이트//권한을 바꾸려는 유저가 로그인 되어있을경우만
         if(member.getRefreshToken() != null){
         String refreshToken = createRefreshToken(member.getEmail(), member.getRole());
-        member.setRefreshToken(refreshToken);}
+        member.updateRefreshToken(refreshToken);}
         //바뀐역할 반환
          memberRepository.save(member);
         return Role.findByCode(member.getRole()).getDescription();
@@ -129,7 +129,7 @@ public class MemberServiceImpl implements MemberService  {
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
-        member.setRefreshToken(null);
+        member.updateRefreshToken(null);
         memberRepository.save(member);
     }
 
@@ -152,14 +152,14 @@ public class MemberServiceImpl implements MemberService  {
                 .refreshToken(refreshToken)
                 .build();
 
-        member.setRefreshToken(refreshToken);
+        member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
 
 
         return newTokens;
         }
         //refresh토큰 이 유효하지 않으면 강제 로그아웃
-        member.setRefreshToken(null);
+        member.updateRefreshToken(null);
         memberRepository.save(member);
         throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
 
@@ -188,8 +188,10 @@ public class MemberServiceImpl implements MemberService  {
 
         return members;
     }
+
+
     //멤버 아이디로 멤버 프로필 가져와서 보여주기
-    @Transactional
+    /*@Transactional
     @Override
     public MemberProfile getMemberProfileById(Long Id){
         MemberProfile memberProfile = memberProfileRepository.findByIdAndDeletedAtIsNull(Id);
@@ -197,7 +199,9 @@ public class MemberServiceImpl implements MemberService  {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         return memberProfile;
-    }
+    }*/
+
+
     //회원 탈퇴//멤버엔티티와 멤버프로필 엔티티의 base엔티티의 deletedAt에 현재 시간을 찍어야 함
     @Transactional
     @Override

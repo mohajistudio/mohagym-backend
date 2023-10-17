@@ -20,10 +20,10 @@ public class MemberProfile extends BaseEntity implements Serializable {
     private Long id;
     private String name;
    // private String profileImage;
-   @JsonIgnore
+
     private LocalDate birthday;
     private String phoneNo;
-    @JsonIgnore
+
     private String sex;
 
     @JsonIgnore

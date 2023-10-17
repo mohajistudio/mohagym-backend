@@ -1,9 +1,6 @@
 package io.mohajistudio.mohagym.web;
 
-import io.mohajistudio.mohagym.configuration.exception.CustomException;
-import io.mohajistudio.mohagym.configuration.exception.ErrorCode;
 import io.mohajistudio.mohagym.entity.Member;
-import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.provider.service.MemberService;
 import io.mohajistudio.mohagym.web.dto.*;
 import jakarta.servlet.http.Cookie;
@@ -24,6 +21,10 @@ import java.util.List;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+
+    //케프 끝나고 상용화 할때 회원 가입시 전화번호 uuid 보내서 인증하는 로직 추가 해보기 //sms, 이메일로 uuid 전송하는 api 서비스 찾아야함//건당 과금이 필요하기에 회의를 통해 결정
+    //전화번호 수정할때도 인증해야함//전화번호나 이메일 골라서
+    //비번 변경 기능 추가하고 인증// 전화번호나 이메일 골라서
 
 
     //회원가입 로직
@@ -120,11 +121,12 @@ public class MemberController {
 
     }
 
+
     //멤버 아이디로 멤버 프로필 가져와서 보여주기
     //멤버 프로필을 jsonignore 처리 했음으로 자세한 데이터를 포함하지 않음 이를 해결 하려면 결국 jsonignore 를 풀고
     //위에서 response dto로 제한하는 방법밖에 없음 아니면 전체조회나 이름 조회시 프로필정보를 반환하지 않도록 하는 방법도 있음
     //이에 대해 창희형과 이야기 해봐야 할 것 같음
-    @GetMapping("/members/{memberId}")
+  /*  @GetMapping("/members/{memberId}")
     public ResponseEntity<MemberProfile> getMemberById(@PathVariable Long memberId) {
         // memberId를 사용하여 회원 정보를 조회하고 반환
         MemberProfile memberProfile = memberService.getMemberProfileById(memberId);
@@ -134,7 +136,9 @@ public class MemberController {
             // 해당 memberId에 해당하는 회원이 없을 경우 404 에러 반환
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
-    }
+    }*/
+
+
     //회원 탈퇴
     @DeleteMapping("/members/{memberId}")
     public ResponseEntity<ResponseMessage> disableMember(@PathVariable Long memberId){

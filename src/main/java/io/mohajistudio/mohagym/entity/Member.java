@@ -1,10 +1,13 @@
 package io.mohajistudio.mohagym.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Data
+@Getter
 @Entity
 @Table(name = "members")
 @EqualsAndHashCode(callSuper = false)
@@ -53,7 +56,13 @@ public class Member extends BaseEntity implements Serializable {
         this.role = role;
         this.salt = salt;
     }
-
-
+    //역할 변경
+    public void updateRole(String role) {
+        this.role = role;
+    }
+    //리프레시토큰 변경
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
 }
