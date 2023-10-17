@@ -28,7 +28,7 @@ public class MemberController {
 
     //회원가입 로직
     @PostMapping("/members")
-    public ResponseEntity<ResponseMessage> register(@Validated @RequestBody requestDto.requestMemberProfile requestDto) {
+    public ResponseEntity<ResponseMessage> register(@Validated @RequestBody requestDto.MemberProfile requestDto) {
         memberService.register(requestDto);
 
         return ResponseEntity.ok().body(ResponseMessage.builder()
@@ -135,6 +135,7 @@ public class MemberController {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
     }
+    //회원 탈퇴
     @DeleteMapping("/members/{memberId}")
     public ResponseEntity<ResponseMessage> disableMember(@PathVariable Long memberId){
         memberService.disableMember(memberId);
@@ -143,6 +144,22 @@ public class MemberController {
                     .message("회원 탈퇴 완료")
                     .build());
 
+    }
+    //이름변경
+    @PostMapping("/name")
+    public ResponseEntity<ResponseMessage> changeName(requestProfile.name dto){
+        memberService.changeName(dto);
+        return ResponseEntity.ok().body(ResponseMessage.builder()
+                .message("이름 변경 완료")
+                .build());
+    }
+    //전화번호 변경
+    @PostMapping("/phoneNo")
+    public ResponseEntity<ResponseMessage> changeName(requestProfile.phoneNo dto){
+        memberService.changePhoneNo(dto);
+        return ResponseEntity.ok().body(ResponseMessage.builder()
+                .message("전화번호 완료")
+                .build());
     }
 
     private ResponseCookie setCookie(String token) {

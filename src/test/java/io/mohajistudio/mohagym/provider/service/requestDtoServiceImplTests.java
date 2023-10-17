@@ -31,7 +31,7 @@ public class requestDtoServiceImplTests {
     @Transactional
     @DisplayName("회원가입 테스트(성공)")
     public void registerAdminTest(){
-        requestDto.requestMemberProfile request = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request = requestDto.MemberProfile.builder()
                 .email("test")
                 .password("1234")
                 .build();
@@ -45,7 +45,7 @@ public class requestDtoServiceImplTests {
     @DisplayName("로그인 테스트(성공)")
     public void loginTest(){
         //회원가입
-        requestDto.requestMemberProfile request = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request = requestDto.MemberProfile.builder()
                 .email("test")
                 .password("1234")
                 .build();
@@ -60,7 +60,7 @@ public class requestDtoServiceImplTests {
     @DisplayName("권한 바꾸기 테스트(성공)")
     public void changeRoleTest(){
         //회원가입1
-        requestDto.requestMemberProfile request = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request = requestDto.MemberProfile.builder()
                 .email("admin")
                 .password("1234")
                 .build();
@@ -70,7 +70,7 @@ public class requestDtoServiceImplTests {
         member.setRole(Role.ADMIN.getCode());
         memberRepository.save(member);
         //회원가입2
-        requestDto.requestMemberProfile request2 = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request2 = requestDto.MemberProfile.builder()
                 .email("user")
                 .password("1234")
                 .build();
@@ -93,7 +93,7 @@ public class requestDtoServiceImplTests {
     @DisplayName("로그아웃(성공)")
     public void logoutTest(){
         //회원가입
-        requestDto.requestMemberProfile request = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request = requestDto.MemberProfile.builder()
                 .email("test")
                 .password("1234")
                 .build();
@@ -116,7 +116,7 @@ public class requestDtoServiceImplTests {
     @DisplayName("토큰 재발급 성공")
     public void reissueTokenTest() throws InterruptedException {
         //회원가입
-        requestDto.requestMemberProfile request = requestDto.requestMemberProfile.builder()
+        requestDto.MemberProfile request = requestDto.MemberProfile.builder()
                 .email("test")
                 .password("1234")
                 .build();

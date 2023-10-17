@@ -7,7 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Data
+@Getter
 @Entity
 @Table(name = "member_profiles")
 @EqualsAndHashCode(callSuper=false)
@@ -39,5 +39,12 @@ public class MemberProfile extends BaseEntity implements Serializable {
         this.phoneNo = phoneNo;
         this.sex = sex;
         this.member = member;
+    }
+    // 직접 필드에 접근하여 수정
+    public void updatePhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+    public void updateName(String name) {
+        this.name = name;
     }
 }

@@ -22,7 +22,7 @@ public class requestDto {
 
 
     @Getter
-    public static class requestMemberProfile extends requestDto{
+    public static class MemberProfile extends requestDto{
         private String name;
       //  private String profileImage;
         private LocalDate birthday;
@@ -30,7 +30,7 @@ public class requestDto {
         private String sex;
 
         @Builder
-        public requestMemberProfile(String email, String password, String name, LocalDate birthday, String phoneNo, String sex) {
+        public MemberProfile(String email, String password, String name, LocalDate birthday, String phoneNo, String sex) {
             super(email, password);
             this.name = name;
             this.birthday = birthday;

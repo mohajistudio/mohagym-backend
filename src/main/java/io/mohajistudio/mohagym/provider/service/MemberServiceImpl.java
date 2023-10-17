@@ -11,6 +11,7 @@ import io.mohajistudio.mohagym.repository.MemberProfileRepository;
 import io.mohajistudio.mohagym.repository.MemberRepository;
 import io.mohajistudio.mohagym.util.SHA256Util;
 import io.mohajistudio.mohagym.web.dto.requestDto;
+import io.mohajistudio.mohagym.web.dto.requestProfile;
 import io.mohajistudio.mohagym.web.dto.requestToken;
 import io.mohajistudio.mohagym.web.dto.responseMember;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class MemberServiceImpl implements MemberService  {
     //회원가입 로직
     @Transactional
     @Override
-    public void register(requestDto.requestMemberProfile requestDto) {
+    public void register(requestDto.MemberProfile requestDto) {
         Member member = memberRepository.findByEmailAndDeletedAtIsNull(requestDto.getEmail());
         if (member != null) { //아이디 중복
             throw new CustomException(ErrorCode.AUTHENTICATION_CONFLICT);
@@ -59,7 +60,7 @@ public class MemberServiceImpl implements MemberService  {
                 .build();
         memberRepository.save(member);
 
-        MemberProfile memberProfile = MemberProfile.builder()
+        MemberProfile memberProfile = io.mohajistudio.mohagym.entity.MemberProfile.builder()
                 .name(requestDto.getName())
                // .profileImage(requestDto.getProfileImage())
                 .birthday(requestDto.getBirthday())
@@ -119,7 +120,7 @@ public class MemberServiceImpl implements MemberService  {
          memberRepository.save(member);
         return Role.findByCode(member.getRole()).getDescription();
     }
-    //로그아웃 로직//dto를 사용하도록 변경
+    //로그아웃 로직
     @Transactional
     @Override
     public void logout(requestToken token){
@@ -139,7 +140,9 @@ public class MemberServiceImpl implements MemberService  {
     @Override
     public responseMember reissueToken(requestToken oldTokens){
         Member member = memberRepository.findByRefreshTokenAndDeletedAtIsNull(oldTokens.getRefreshToken());
-
+        if (member == null) {
+            throw new CustomException(ErrorCode.NOT_AUTHORIZED);
+        }
         if(jwtAuthTokenProvider.convertAuthToken(oldTokens.getRefreshToken()).validate()){//refresh토큰 유효성 조사
         //refreshToken 업데이트//RTR방식
         String refreshToken = createRefreshToken(member.getEmail(),member.getRole());
@@ -162,18 +165,8 @@ public class MemberServiceImpl implements MemberService  {
 
     }
 
-    private String createAccessToken(String userId,String role) {
-        Date expiredDate = Date.from(LocalDateTime.now().plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 1시간을 더한 시간을 만들어서 만료 날짜를 설정
-        JwtAuthToken accessToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);
-        return accessToken.getToken();
-    }
 
-    private String createRefreshToken(String userId, String role) {
-        Date expiredDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 30일을 더한 시간을 만들어서 만료 날짜를 설정
-        JwtAuthToken refreshToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);
-        return refreshToken.getToken();
-    }
-
+    //모든 회원 조회
     @Transactional
     @Override
     public Page<Member> getAllMembers(int page, int size){
@@ -188,20 +181,31 @@ public class MemberServiceImpl implements MemberService  {
     public Page<Member> getMemberByName(int page, int size, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, "id"); // id 필드를 오름차순으로 정렬
         Pageable pageable = PageRequest.of(page,size,sort);// 페이지 및 사이즈와 정렬 조건을 함께 설정
-        return memberRepository.findByMemberProfileNameContainingAndDeletedAtIsNull(name, pageable);
+        Page<Member> members = memberRepository.findByMemberProfileNameContainingAndDeletedAtIsNull(name, pageable);
+        if (!members.hasContent()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+
+        return members;
     }
     //멤버 아이디로 멤버 프로필 가져와서 보여주기
     @Transactional
     @Override
     public MemberProfile getMemberProfileById(Long Id){
-
-        return memberProfileRepository.findByIdAndDeletedAtIsNull(Id);
+        MemberProfile memberProfile = memberProfileRepository.findByIdAndDeletedAtIsNull(Id);
+        if (memberProfile == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        return memberProfile;
     }
     //회원 탈퇴//멤버엔티티와 멤버프로필 엔티티의 base엔티티의 deletedAt에 현재 시간을 찍어야 함
     @Transactional
     @Override
     public void disableMember(Long Id){
         Member member = memberRepository.findByIdAndDeletedAtIsNull(Id);
+        if (member == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
         if (member.getDeletedAt() == null) {
             member.setDeletedAt(LocalDateTime.now());
             memberRepository.save(member);
@@ -216,5 +220,41 @@ public class MemberServiceImpl implements MemberService  {
         else{
             throw new CustomException(ErrorCode.Already_Deleted);
         }
+    }
+    //프로필 수정(이름 변경)
+    @Transactional
+    @Override
+    public void changeName(requestProfile.name dto){
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(dto.getId());
+        if (member == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        MemberProfile memberProfile = member.getMemberProfile();
+        memberProfile.updateName(dto.getName());
+        memberProfileRepository.save(memberProfile);
+    }
+    //프로필 수정(전화번호 수정)
+    @Transactional
+    @Override
+    public void changePhoneNo(requestProfile.phoneNo dto){
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(dto.getId());
+        if (member == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+        MemberProfile memberProfile = member.getMemberProfile();
+        memberProfile.updatePhoneNo(dto.getPhoneNo());
+        memberProfileRepository.save(memberProfile);
+    }
+
+    private String createAccessToken(String userId,String role) {
+        Date expiredDate = Date.from(LocalDateTime.now().plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 1시간을 더한 시간을 만들어서 만료 날짜를 설정
+        JwtAuthToken accessToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);
+        return accessToken.getToken();
+    }
+
+    private String createRefreshToken(String userId, String role) {
+        Date expiredDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant()); //현재 시간에서 30일을 더한 시간을 만들어서 만료 날짜를 설정
+        JwtAuthToken refreshToken = jwtAuthTokenProvider.createAuthToken(userId, role, expiredDate);
+        return refreshToken.getToken();
     }
 }

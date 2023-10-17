@@ -4,6 +4,7 @@ package io.mohajistudio.mohagym.provider.service;
 import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.web.dto.requestDto;
+import io.mohajistudio.mohagym.web.dto.requestProfile;
 import io.mohajistudio.mohagym.web.dto.requestToken;
 import io.mohajistudio.mohagym.web.dto.responseMember;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Page;
 
 public interface MemberService {
     //회원가입
-    void register(requestDto.requestMemberProfile requestDto);
+    void register(requestDto.MemberProfile requestDto);
     //로그인
     responseMember login(requestDto requestDto);
 
@@ -31,6 +32,8 @@ public interface MemberService {
     //회원 정보 수정
     //롤 체인지
     String changeRole(String name);
-    //폰 번호 변경 //request 정의한 후 만들기
-    //void changePhoneNumber(Long Id);
+    //폰 번호 변경
+    void changeName(requestProfile.name dto);
+
+    void changePhoneNo(requestProfile.phoneNo dto);
 }
