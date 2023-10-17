@@ -125,7 +125,7 @@ public class MemberServiceImpl implements MemberService  {
     @Override
     public void logout(requestToken token){
 
-        Member member = memberRepository.findByEmailAndDeletedAtIsNull(jwtAuthTokenProvider.getUserIdFromToken(token.getAccessToken()));
+        Member member = memberRepository.findByEmailAndDeletedAtIsNull(jwtAuthTokenProvider.getEmailFromToken(token.getAccessToken()));
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
