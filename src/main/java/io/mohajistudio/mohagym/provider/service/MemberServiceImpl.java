@@ -4,16 +4,21 @@ import io.mohajistudio.mohagym.configuration.exception.CustomException;
 import io.mohajistudio.mohagym.configuration.exception.ErrorCode;
 import io.mohajistudio.mohagym.core.security.role.Role;
 import io.mohajistudio.mohagym.entity.Member;
+import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.provider.security.JwtAuthToken;
 import io.mohajistudio.mohagym.provider.security.JwtAuthTokenProvider;
+import io.mohajistudio.mohagym.repository.MemberProfileRepository;
 import io.mohajistudio.mohagym.repository.MemberRepository;
 import io.mohajistudio.mohagym.util.SHA256Util;
-import io.mohajistudio.mohagym.web.dto.requestMember;
+import io.mohajistudio.mohagym.web.dto.requestDto;
 import io.mohajistudio.mohagym.web.dto.requestToken;
-import io.mohajistudio.mohagym.web.dto.requestUserId;
 import io.mohajistudio.mohagym.web.dto.responseMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +34,15 @@ import java.util.Date;
 public class MemberServiceImpl implements MemberService  {
 
     private final MemberRepository memberRepository;
+    private final MemberProfileRepository memberProfileRepository;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
 
 
     //회원가입 로직
     @Transactional
     @Override
-    public void register(requestMember requestDto) {
-        Member member = memberRepository.findByUserId(requestDto.getUserId());
+    public void register(requestDto.requestMemberProfile requestDto) {
+        Member member = memberRepository.findByEmailAndDeletedAtIsNull(requestDto.getEmail());
         if (member != null) { //아이디 중복
             throw new CustomException(ErrorCode.AUTHENTICATION_CONFLICT);
         }
@@ -46,31 +52,41 @@ public class MemberServiceImpl implements MemberService  {
         String encryptedPassword = SHA256Util.getEncrypt(requestDto.getPassword(), salt);
 
         member = io.mohajistudio.mohagym.entity.Member.builder()
-                .userId(requestDto.getUserId())
+                .email(requestDto.getEmail())
                 .password(encryptedPassword)
                 .salt(salt)
                 .role(Role.USER.getCode())
                 .build();
         memberRepository.save(member);
+
+        MemberProfile memberProfile = MemberProfile.builder()
+                .name(requestDto.getName())
+               // .profileImage(requestDto.getProfileImage())
+                .birthday(requestDto.getBirthday())
+                .phoneNo(requestDto.getPhoneNo())
+                .sex(requestDto.getSex())
+                .member(member).build();
+
+        memberProfileRepository.save(memberProfile);
     }
     @Transactional
     @Override
-    public responseMember login(requestMember requestDto) {
-        Member member = memberRepository.findByUserId(requestDto.getUserId());
+    public responseMember login(requestDto requestDto) {
+        Member member = memberRepository.findByEmailAndDeletedAtIsNull(requestDto.getEmail());
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         //솔트 꺼내기
         String salt = member.getSalt();
-        member = memberRepository.findByUserIdAndPassword(requestDto.getUserId(),
+        member = memberRepository.findByEmailAndPasswordAndDeletedAtIsNull(requestDto.getEmail(),
                 SHA256Util.getEncrypt(requestDto.getPassword(), salt));
         if (member == null) {//비밀번호가 틀렸을 경우
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         //로그인 성공
-        String refreshToken = createRefreshToken(member.getUserId(),member.getRole());
+        String refreshToken = createRefreshToken(member.getEmail(),member.getRole());
         responseMember login = responseMember.builder()
-                .accessToken(createAccessToken(member.getUserId(), member.getRole()))
+                .accessToken(createAccessToken(member.getEmail(), member.getRole()))
                 .refreshToken(refreshToken)
                 .build();
         //refreshToken 업데이트
@@ -80,23 +96,24 @@ public class MemberServiceImpl implements MemberService  {
     }
     @Transactional
     @Override
-    public String changeRole( requestUserId requestDto ){
+    public String changeRole(String name){
 
         //바꾸려는 사용자의 정보 조회(역할 조회)
-        Member member = memberRepository.findByUserId(requestDto.getUserId());
+        Member member = memberProfileRepository.findByNameAndDeletedAtIsNull(name).getMember();
+
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         //역할 바꾸는 로직(어드민->일반, 일반->어드민)
-        if(member.getRole() == Role.USER.getCode()){
+        if(member.getRole().equals( Role.USER.getCode())){
             member.setRole(Role.ADMIN.getCode());
         }
         else{
         member.setRole(Role.USER.getCode());}
         //refreshToken 업데이트//권한을 바꾸려는 유저가 로그인 되어있을경우만
         if(member.getRefreshToken() != null){
-        String refreshToken = createRefreshToken(member.getUserId(), member.getRole());
+        String refreshToken = createRefreshToken(member.getEmail(), member.getRole());
         member.setRefreshToken(refreshToken);}
         //바뀐역할 반환
          memberRepository.save(member);
@@ -107,7 +124,7 @@ public class MemberServiceImpl implements MemberService  {
     @Override
     public void logout(requestToken token){
 
-        Member member = memberRepository.findByUserId(jwtAuthTokenProvider.getUserIdFromToken(token.getAccessToken()));
+        Member member = memberRepository.findByEmailAndDeletedAtIsNull(jwtAuthTokenProvider.getUserIdFromToken(token.getAccessToken()));
         if (member == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
@@ -121,15 +138,14 @@ public class MemberServiceImpl implements MemberService  {
     @Transactional
     @Override
     public responseMember reissueToken(requestToken oldTokens){
-        Member member = memberRepository.findByRefreshToken(oldTokens.getRefreshToken());
+        Member member = memberRepository.findByRefreshTokenAndDeletedAtIsNull(oldTokens.getRefreshToken());
 
         if(jwtAuthTokenProvider.convertAuthToken(oldTokens.getRefreshToken()).validate()){//refresh토큰 유효성 조사
-
         //refreshToken 업데이트//RTR방식
-        String refreshToken = createRefreshToken(member.getUserId(),member.getRole());
+        String refreshToken = createRefreshToken(member.getEmail(),member.getRole());
         //accessToken 재발급
         responseMember  newTokens = responseMember.builder()
-                .accessToken(createAccessToken(member.getUserId(), member.getRole()))
+                .accessToken(createAccessToken(member.getEmail(), member.getRole()))
                 .refreshToken(refreshToken)
                 .build();
 
@@ -158,4 +174,47 @@ public class MemberServiceImpl implements MemberService  {
         return refreshToken.getToken();
     }
 
+    @Transactional
+    @Override
+    public Page<Member> getAllMembers(int page, int size){
+        Sort sort = Sort.by(Sort.Direction.ASC, "id"); // id 필드를 오름차순으로 정렬
+        Pageable pageable = PageRequest.of(page,size,sort);// 페이지 및 사이즈와 정렬 조건을 함께 설정
+        return memberRepository.findAllByDeletedAtIsNull(pageable);
+
+    }
+    //이름으로 회원 검색
+    @Transactional
+    @Override
+    public Page<Member> getMemberByName(int page, int size, String name){
+        Sort sort = Sort.by(Sort.Direction.ASC, "id"); // id 필드를 오름차순으로 정렬
+        Pageable pageable = PageRequest.of(page,size,sort);// 페이지 및 사이즈와 정렬 조건을 함께 설정
+        return memberRepository.findByMemberProfileNameContainingAndDeletedAtIsNull(name, pageable);
+    }
+    //멤버 아이디로 멤버 프로필 가져와서 보여주기
+    @Transactional
+    @Override
+    public MemberProfile getMemberProfileById(Long Id){
+
+        return memberProfileRepository.findByIdAndDeletedAtIsNull(Id);
+    }
+    //회원 탈퇴//멤버엔티티와 멤버프로필 엔티티의 base엔티티의 deletedAt에 현재 시간을 찍어야 함
+    @Transactional
+    @Override
+    public void disableMember(Long Id){
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(Id);
+        if (member.getDeletedAt() == null) {
+            member.setDeletedAt(LocalDateTime.now());
+            memberRepository.save(member);
+        }else {
+            throw new CustomException(ErrorCode.Already_Deleted);
+        }
+
+        MemberProfile memberProfile = memberProfileRepository.findByIdAndDeletedAtIsNull(Id);
+        if (memberProfile.getDeletedAt() == null) {
+        memberProfile.setDeletedAt(LocalDateTime.now());
+        memberProfileRepository.save(memberProfile);}
+        else{
+            throw new CustomException(ErrorCode.Already_Deleted);
+        }
+    }
 }

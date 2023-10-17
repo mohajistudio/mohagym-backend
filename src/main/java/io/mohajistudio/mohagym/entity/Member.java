@@ -1,33 +1,59 @@
 package io.mohajistudio.mohagym.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Data
 @Entity
 @Table(name = "members")
 @EqualsAndHashCode(callSuper = false)
-public class Member extends BaseEntity {
+@NoArgsConstructor
+public class Member extends BaseEntity implements Serializable {
+    public static final long serialVersionUID = 1234L;
+
+
     private String email;
+    @JsonIgnore
     private String password;
-    private String role;
+    @JsonIgnore
     private String salt;
+    @JsonIgnore
+    private String role;
+    @JsonIgnore
     private String refreshToken;
 
-    @OneToOne(mappedBy = "member")
-    private MemberProfile memberProfile;
 
+    @OneToOne(mappedBy = "member")
+    private  MemberProfile memberProfile;
+    @JsonIgnore
     @OneToMany(mappedBy = "author")
     private List<Notice> notices = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
-    private List<AttendanceCheck> attendanceChecks = new ArrayList<>();
+    private  List<AttendanceCheck> attendanceChecks = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
     private List<ExerciseRecord> exerciseRecords = new ArrayList<>();
+
+    @Builder
+    public Member(String email, String password, String role, String salt) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.salt = salt;
+    }
+
+
+
 }
