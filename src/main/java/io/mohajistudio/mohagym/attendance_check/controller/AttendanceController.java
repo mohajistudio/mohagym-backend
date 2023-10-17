@@ -28,11 +28,11 @@ public class AttendanceController {
     }
 
 
-    @GetMapping("/members/{memberId}/attendance-checks/{id}/{year}/{month}")
+    @GetMapping("/members/{memberId}/attendance-checks/{id}")
     public ResponseEntity<List<AttendanceDTO>> attendanceRecord(
             @PathVariable Long id,
-            @PathVariable int year,
-            @PathVariable int month) {
+            @RequestParam(name = "year") int year,
+            @RequestParam(name = "month") int month) {
         return attendanceService.attendanceRecord(id, year, month);
     }
 

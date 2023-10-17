@@ -36,7 +36,7 @@ public class AttendanceService {
             AttendanceCheckTime savedAttendanceCheckTime = attendanceCheckTimeRepository.save(attendanceCheckTime);
 
             AttendanceDTO attendanceDTO = new AttendanceDTO();
-            attendanceDTO.setMemberId(savedAttendanceCheckTime.getId());
+            attendanceDTO.setAttendanceCheckId(attendanceCheckTime.getId());
             attendanceDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
 
             response.put("status", "success");
@@ -62,7 +62,7 @@ public class AttendanceService {
             for (AttendanceCheckTime attendanceCheckTime : attendanceCheckTimes) {
                 AttendanceDTO attendanceDTO = new AttendanceDTO();
 
-                attendanceDTO.setMemberId(attendanceCheckTime.getId());
+                attendanceDTO.setAttendanceCheckId(attendanceCheckTime.getId());
                 attendanceDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
                 attendanceDTOList.add(attendanceDTO);
             }
