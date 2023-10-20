@@ -5,7 +5,7 @@ import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.repository.MemberRepository;
 import io.mohajistudio.mohagym.web.dto.requestDto;
 import io.mohajistudio.mohagym.web.dto.requestToken;
-import io.mohajistudio.mohagym.web.dto.responseMember;
+import io.mohajistudio.mohagym.web.dto.responseToken;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class requestDtoServiceImplTests {
                 .build();
         memberServiceImpl.register(request);
         //로그인
-        responseMember token = memberServiceImpl.login(request);
+        responseToken token = memberServiceImpl.login(request);
         assertNotNull(token);
     }
 
@@ -67,7 +67,7 @@ public class requestDtoServiceImplTests {
         memberServiceImpl.register(request);
         //권한 어드민으로 강제 변경
         Member member = memberRepository.findByEmailAndDeletedAtIsNull("admin");
-        member.setRole(Role.ADMIN.getCode());
+        member.updateRole(Role.ADMIN.getCode());
         memberRepository.save(member);
         //회원가입2
         requestDto.MemberProfile request2 = requestDto.MemberProfile.builder()
@@ -99,7 +99,7 @@ public class requestDtoServiceImplTests {
                 .build();
         memberServiceImpl.register(request);
         //로그인
-        responseMember tokens = memberServiceImpl.login(request);
+        responseToken tokens = memberServiceImpl.login(request);
         //requestToken 로 파싱
         requestToken tokens2 = requestToken.builder()
                 .accessToken(tokens.getAccessToken())
@@ -122,7 +122,7 @@ public class requestDtoServiceImplTests {
                 .build();
         memberServiceImpl.register(request);
         //로그인
-        responseMember tokens = memberServiceImpl.login(request);
+        responseToken tokens = memberServiceImpl.login(request);
         System.out.println("tokens = " + tokens);
         //requestToken 로 파싱
         requestToken tokens2 = requestToken.builder()
@@ -131,7 +131,7 @@ public class requestDtoServiceImplTests {
         System.out.println("tokens2 = " + tokens2);
         Thread.sleep(1000); // 로그인과 동시에 재발급이 이루어 지면 만료 일이 같아서 토큰도 같음
         //토큰 재발급
-        responseMember tokens3 = memberServiceImpl.reissueToken(tokens2);
+        responseToken tokens3 = memberServiceImpl.reissueToken(tokens2);
         System.out.println("tokens3 = " + tokens3);
         //엑세스토큰 불일치 확인
         assertThat(tokens2.getAccessToken()).isNotEqualTo(tokens3.getAccessToken());

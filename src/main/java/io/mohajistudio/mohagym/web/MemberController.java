@@ -1,6 +1,9 @@
 package io.mohajistudio.mohagym.web;
 
+import io.mohajistudio.mohagym.configuration.exception.CustomException;
+import io.mohajistudio.mohagym.configuration.exception.ErrorCode;
 import io.mohajistudio.mohagym.entity.Member;
+import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.provider.service.MemberService;
 import io.mohajistudio.mohagym.web.dto.*;
 import jakarta.servlet.http.Cookie;
@@ -40,7 +43,7 @@ public class MemberController {
     //로그인
     @PostMapping("/login") //경로//POST매핑
     public ResponseEntity<ResponseMessage> login(@Validated @RequestBody requestDto requestDto, HttpServletResponse response) { //@Validated로 요청 바디(@RequestBody)에 대한 유효성 검사//RequestMember.Member 객체(요청모델)로 변환합니다.
-        responseMember tokens = memberService.login(requestDto);
+        responseToken tokens = memberService.login(requestDto);
 
         ResponseCookie cookie = setCookie(tokens.getRefreshToken());
         response.setHeader("Set-Cookie", cookie.toString());
@@ -91,7 +94,7 @@ public class MemberController {
                 .refreshToken(refreshToken)
                 .build();
 
-        responseMember newTokens = memberService.reissueToken(oldTokens);
+        responseToken newTokens = memberService.reissueToken(oldTokens);
 
         ResponseCookie cookie = setCookie(newTokens.getRefreshToken());
         response.setHeader("Set-Cookie", cookie.toString());
@@ -105,17 +108,17 @@ public class MemberController {
 
     //전체조회 혹은 이름으로 검색
     @GetMapping("/members")
-    public ResponseEntity<List<Member>> getAllMembers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) String name
+    public ResponseEntity<List<responseDto.Member>> getAllMembers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) String name
     //localhost:8080/members?page=0&size=20 과 동일
     ) {
 
         if (name != null) {
-            Page<Member> membersPage = memberService.getMemberByName(page, size,name);
-            List<Member> members =  membersPage.getContent();
+            Page<responseDto.Member> membersPage = memberService.getMemberByName(page, size,name);
+            List<responseDto.Member> members =  membersPage.getContent();
             return ResponseEntity.ok(members);
         } else {
-            Page<Member> membersPage = memberService.getAllMembers(page, size);
-            List<Member> members =  membersPage.getContent();
+            Page<responseDto.Member> membersPage = memberService.getAllMembers(page, size);
+            List<responseDto.Member> members =  membersPage.getContent();
             return ResponseEntity.ok(members);
         }
 
@@ -126,7 +129,7 @@ public class MemberController {
     //멤버 프로필을 jsonignore 처리 했음으로 자세한 데이터를 포함하지 않음 이를 해결 하려면 결국 jsonignore 를 풀고
     //위에서 response dto로 제한하는 방법밖에 없음 아니면 전체조회나 이름 조회시 프로필정보를 반환하지 않도록 하는 방법도 있음
     //이에 대해 창희형과 이야기 해봐야 할 것 같음
-  /*  @GetMapping("/members/{memberId}")
+    @GetMapping("/members/{memberId}")
     public ResponseEntity<MemberProfile> getMemberById(@PathVariable Long memberId) {
         // memberId를 사용하여 회원 정보를 조회하고 반환
         MemberProfile memberProfile = memberService.getMemberProfileById(memberId);
@@ -136,7 +139,7 @@ public class MemberController {
             // 해당 memberId에 해당하는 회원이 없을 경우 404 에러 반환
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
-    }*/
+    }
 
 
     //회원 탈퇴
