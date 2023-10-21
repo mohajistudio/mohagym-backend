@@ -34,9 +34,9 @@ public class JwtAuthTokenProvider implements AuthTokenProvider<JwtAuthToken> {
         return new JwtAuthToken(token, key);
     }
 
-    public String getUserIdFromToken(String token){
+    public String getEmailFromToken(String token){
         JwtAuthToken jwtAuthToken = convertAuthToken(token);
-        return jwtAuthToken.userIdFromClaim();
+        return jwtAuthToken.EmailFromClaim();
     }
 
     @Override

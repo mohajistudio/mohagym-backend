@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberProfileRepository extends JpaRepository<MemberProfile, Long> {
+    MemberProfile findByNameAndDeletedAtIsNull(String name);
+
+    MemberProfile findByIdAndDeletedAtIsNull(Long Id);
 }

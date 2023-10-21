@@ -40,12 +40,8 @@ public class JwtAuthToken implements AuthToken<Claims> {
                 .setExpiration(expiredDate)// 토큰의 만료 날짜 설정
                 .compact(); //토큰을 문자열로 변환하고 반환
     }
-    public String roleFromClaim(){
-        Claims claims = getClaims();
-        return  claims.get(AUTHORITIES_KEY,String.class);
-    }
 
-    public String userIdFromClaim(){
+    public String EmailFromClaim(){
         Claims claims = getClaims();
         return claims.getSubject();
     }

@@ -3,12 +3,11 @@ package io.mohajistudio.mohagym.web.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 
 @Builder
 @Data
-public class responseMember {
+public class responseToken {
 
     private String accessToken;
 
