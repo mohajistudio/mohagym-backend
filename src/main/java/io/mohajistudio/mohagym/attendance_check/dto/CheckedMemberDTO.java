@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class AttendanceDTO {
-    private Long attendanceCheckId;
+public class CheckedMemberDTO {
+    private Long memberId;
     private LocalDateTime createdAt;
 
-    public AttendanceDTO() {
+    public CheckedMemberDTO() {
     }
 }
 

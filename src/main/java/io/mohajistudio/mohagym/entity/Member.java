@@ -65,4 +65,5 @@ public class Member extends BaseEntity implements Serializable {
         this.refreshToken = refreshToken;
     }
 
+
 }
