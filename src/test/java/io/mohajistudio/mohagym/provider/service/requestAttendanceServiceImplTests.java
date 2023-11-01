@@ -19,11 +19,8 @@
 //
 //@ActiveProfiles("test")
 //@SpringBootTest
-//<<<<<<<< HEAD:src/test/java/io/mohajistudio/mohagym/provider/service/requestAttendanceServiceImplTests.java
 //public class requestAttendanceServiceImplTests {
-//========
 //public class requestDtoServiceImplTests {
-//>>>>>>>> upstream/main:src/test/java/io/mohajistudio/mohagym/provider/service/requestDtoServiceImplTests.java
 //
 //    @Autowired
 //    private MemberServiceImpl memberServiceImpl;

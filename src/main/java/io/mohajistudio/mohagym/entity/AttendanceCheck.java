@@ -11,4 +11,6 @@ import lombok.EqualsAndHashCode;
 public class AttendanceCheck extends BaseEntity {
     @ManyToOne(optional = false)
     private Member member;
+
+
 }
