@@ -19,7 +19,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
-        List<String> excludePatterns = Arrays.asList("/h2-console/**","/favicon.ico","/register","/login","/token","/members/**");
+        List<String> excludePatterns = Arrays.asList("/h2-console/**","/favicon.ico","/register","/login","/token");
         registry.addInterceptor(authenticationInterceptor)
                 .addPathPatterns("/**")// 전체 경로에 대해서 인터셉터 등록
                 .excludePathPatterns(excludePatterns);//해당 경로 인터셉터 예외 설정
