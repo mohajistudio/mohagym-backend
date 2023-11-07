@@ -1,8 +1,8 @@
-package io.mohajistudio.mohagym.attendance_check.service;
+package io.mohajistudio.mohagym.provider.service;
 
-import io.mohajistudio.mohagym.attendance_check.dto.AttendanceCheckDTO;
-import io.mohajistudio.mohagym.attendance_check.dto.CheckedMemberDTO;
-import io.mohajistudio.mohagym.attendance_check.repository.AttendanceCheckRepository;
+import io.mohajistudio.mohagym.web.dto.AttendanceCheckDTO;
+import io.mohajistudio.mohagym.web.dto.CheckedMemberDTO;
+import io.mohajistudio.mohagym.repository.AttendanceCheckRepository;
 import io.mohajistudio.mohagym.entity.AttendanceCheck;
 import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.repository.MemberRepository;
@@ -15,11 +15,11 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Service
-public class AttendanceCheckService {
+public class AttendanceCheckServiceImpl implements AttendanceCheckService{
     private final MemberRepository memberRepository;
     private final AttendanceCheckRepository attendanceCheckRepository;
 
-    public AttendanceCheckService(MemberRepository memberRepository, AttendanceCheckRepository attendanceCheckRepository) {
+    public AttendanceCheckServiceImpl(MemberRepository memberRepository, AttendanceCheckRepository attendanceCheckRepository) {
         this.memberRepository = memberRepository;
         this.attendanceCheckRepository = attendanceCheckRepository;
     }

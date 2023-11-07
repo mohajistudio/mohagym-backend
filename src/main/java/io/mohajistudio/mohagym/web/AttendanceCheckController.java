@@ -1,9 +1,9 @@
-package io.mohajistudio.mohagym.attendance_check.controller;
+package io.mohajistudio.mohagym.web;
 
 
-import io.mohajistudio.mohagym.attendance_check.dto.AttendanceCheckDTO;
-import io.mohajistudio.mohagym.attendance_check.dto.CheckedMemberDTO;
-import io.mohajistudio.mohagym.attendance_check.service.AttendanceCheckService;
+import io.mohajistudio.mohagym.web.dto.AttendanceCheckDTO;
+import io.mohajistudio.mohagym.web.dto.CheckedMemberDTO;
+import io.mohajistudio.mohagym.provider.service.AttendanceCheckService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,8 @@ import java.util.List;
 @RestController
 public class AttendanceCheckController {
 
-
-
-
     private final AttendanceCheckService attendanceCheckService;
+
 
     public AttendanceCheckController(AttendanceCheckService attendanceCheckService) {
         this.attendanceCheckService = attendanceCheckService;
@@ -26,13 +24,13 @@ public class AttendanceCheckController {
 
 
     //id 조회
-    @PostMapping("/members/:memberId/attendance-checks/{id}")
+    @PostMapping("/members/attendance-checks/{id}")
     public ResponseEntity<AttendanceCheckDTO> attendanceCheck(@PathVariable Long id) {
         return attendanceCheckService.attendanceCheck(id);
     }
 
 
-    @GetMapping("/members/{memberId}/attendance-checks/{id}")
+    @GetMapping("/members/attendance-checks/{id}")
     public ResponseEntity<List<CheckedMemberDTO>> getAttendance(
             @PathVariable Long id,
             @RequestParam(name = "year") int year,

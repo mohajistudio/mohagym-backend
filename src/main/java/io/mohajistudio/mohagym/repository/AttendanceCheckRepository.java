@@ -1,4 +1,4 @@
-package io.mohajistudio.mohagym.attendance_check.repository;
+package io.mohajistudio.mohagym.repository;
 
 import io.mohajistudio.mohagym.entity.AttendanceCheck;
 import org.springframework.data.jpa.repository.JpaRepository;
