@@ -9,8 +9,17 @@ import lombok.EqualsAndHashCode;
 @Table(name = "notices")
 @EqualsAndHashCode(callSuper = false)
 public class Notice extends BaseEntity {
+    @Column(name = "title")
     private String title;
-    private String body;
+
+    @Column(name = "content")
+    private String content;
+
+    @Column(name = "writer")
+    private String writer;
+
+    @Column(name = "view_cnt")
+    private Integer viewCnt;
 
     @ManyToOne(optional = false)
     private Member author;
