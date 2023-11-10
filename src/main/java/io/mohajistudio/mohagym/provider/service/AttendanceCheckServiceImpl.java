@@ -1,14 +1,14 @@
 package io.mohajistudio.mohagym.provider.service;
 
 import io.mohajistudio.mohagym.web.dto.AttendanceCheckDTO;
-import io.mohajistudio.mohagym.web.dto.CheckedMemberDTO;
 import io.mohajistudio.mohagym.repository.AttendanceCheckRepository;
 import io.mohajistudio.mohagym.entity.AttendanceCheck;
 import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,52 +24,89 @@ public class AttendanceCheckServiceImpl implements AttendanceCheckService{
         this.attendanceCheckRepository = attendanceCheckRepository;
     }
 
-    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long id) {
-        Optional<Member> memberEntity = memberRepository.findById(id);
+    //    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long id) {
+//        Optional<Member> memberEntity = memberRepository.findById(id);
+//        Map<String, Object> response = new HashMap<>();
+//        if (memberEntity.isPresent()) {
+//            Member member = memberEntity.get();
+//
+//            AttendanceCheck attendanceCheck = new AttendanceCheck();
+//            attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+//            attendanceCheck.setMember(member);
+//
+//            AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
+//
+//            AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
+//            attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
+//            attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
+//
+//            response.put("status", "success");
+//            response.put("created at", savedAttendanceCheckTime.getCreatedAt());
+//
+//            return ResponseEntity.ok(attendanceCheckDTO);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+
+    @Override
+    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long memberId, Long attendanceCheckId) {
+        Optional<Member> memberEntity = memberRepository.findById(memberId);
         Map<String, Object> response = new HashMap<>();
+
         if (memberEntity.isPresent()) {
             Member member = memberEntity.get();
 
-            AttendanceCheck attendanceCheck = new AttendanceCheck();
-            attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-            attendanceCheck.setMember(member);
+            // 여기서 출석체크 ID와 멤버 ID를 비교
+            if (attendanceCheckId.equals(member.getId())) {
+                AttendanceCheck attendanceCheck = new AttendanceCheck();
+                attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+                attendanceCheck.setMember(member);
 
-            AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
+                AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
 
-            AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
-            attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
-            attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
+                AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
+                attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
+                attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
 
-            response.put("status", "success");
-            response.put("created at", savedAttendanceCheckTime.getCreatedAt());
+                response.put("status", "success");
+                response.put("created at", savedAttendanceCheckTime.getCreatedAt());
 
-            return ResponseEntity.ok(attendanceCheckDTO);
+                return ResponseEntity.ok(attendanceCheckDTO);
+            } else {
+                // 출석체크 ID와 멤버 ID가 일치하지 않는 경우 오류 응답 반환
+                response.put("status", "error");
+                response.put("message", "AttendanceCheck ID does not match Member ID");
+                return ResponseEntity.badRequest().body((AttendanceCheckDTO) response);
+            }
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @ResponseBody
-    public ResponseEntity<List<CheckedMemberDTO>> getAttendance(Long memberId, int year, int month) {
-        Optional<Member> memberEntity = memberRepository.findById(memberId);
+
+
+
+    @Override
+    public ResponseEntity<Page<AttendanceCheckDTO>> getAttendance(Long id, int year, int month, Pageable pageable) {
+        Optional<Member> memberEntity = memberRepository.findById(id);
         if (memberEntity.isPresent()) {
             LocalDateTime startDateTime = LocalDateTime.of(year, month, 1, 0, 0);
             LocalDateTime endDateTime = startDateTime.plusMonths(1).minusNanos(1);
 
-            List<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(memberId, startDateTime, endDateTime);
+            Page<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(id, startDateTime, endDateTime, pageable);
 
+            Page<AttendanceCheckDTO> attendanceCheckDTOPage = attendanceCheckTimes.map(attendanceCheckTime -> {
+                AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
+                attendanceCheckDTO.setAttendanceCheckedId(attendanceCheckTime.getId());
+                attendanceCheckDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
+                return attendanceCheckDTO;
+            });
 
-            List<CheckedMemberDTO> checkedMemberDTOList = new ArrayList<>();
-            for (AttendanceCheck attendanceCheckTime : attendanceCheckTimes) {
-                CheckedMemberDTO checkedMemberDTO = new CheckedMemberDTO();
-                checkedMemberDTO.setMemberId(memberId);
-                checkedMemberDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
-                checkedMemberDTOList.add(checkedMemberDTO);
-            }
-
-            return ResponseEntity.ok(checkedMemberDTOList);
+            return ResponseEntity.ok(attendanceCheckDTOPage);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
