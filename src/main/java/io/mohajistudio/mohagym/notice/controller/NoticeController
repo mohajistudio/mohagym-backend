@@ -29,19 +29,23 @@ public class NoticeController {
     private NoticeService noticeService;
 
     // create board rest api
-    @PostMapping("/boards")
-    public Notice createBoard(@RequestBody Notice notice) {
-        return noticeService.createBoard(notice);
+    @PostMapping("/notice")
+    public ResponseEntity<?> createNotice(@Validated @RequestBody ResponseDTO responseDTO) {
+        Notice notice = new Notice();
+        notice.setTitle(notice.getTitle());
+        notice.setContent(responseDTO.getContent());
+        notice.setViewCnt(responseDTO.getViewCnt());
+
+        return ResponseEntity.ok(noticeService.createNotice(notice));
     }
 
-
-
-
-
     // list all boards
-    @GetMapping("/boards")
-    public List<Notice> listAllBoards() {
-        return noticeService.listAllBoards();
+    @GetMapping("/notice")
+    public Page<Notice> listAllNotices(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return noticeService.listAllNotices(PageRequest.of(page, size));
     }
 
     // get board by id
