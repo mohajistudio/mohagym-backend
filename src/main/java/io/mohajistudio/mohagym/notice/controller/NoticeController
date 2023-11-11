@@ -66,14 +66,5 @@ public class NoticeController {
     public ResponseEntity<Map<String, Boolean>> deleteBoard(@PathVariable Integer id) {
         return noticeService.deleteBoard(id);
     }
-    // list all boards with paging
-    @GetMapping("/paging")
-    public ResponseEntity<Page<Notice>> listAllBoards(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Notice> boards = noticeService.listAllBoards(pageable);
-        return ResponseEntity.ok(boards);
-    }
-
+  
 }
