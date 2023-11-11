@@ -1,4 +1,4 @@
-package io.mohajistudio.mohagym.attendance_check.dto;
+package io.mohajistudio.mohagym.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;

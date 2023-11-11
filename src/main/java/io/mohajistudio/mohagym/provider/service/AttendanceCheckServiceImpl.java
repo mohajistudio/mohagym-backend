@@ -1,31 +1,31 @@
-package io.mohajistudio.mohagym.attendance_check.service;
+package io.mohajistudio.mohagym.provider.service;
 
-import io.mohajistudio.mohagym.attendance_check.dto.AttendanceCheckDTO;
-import io.mohajistudio.mohagym.attendance_check.dto.CheckedMemberDTO;
-import io.mohajistudio.mohagym.attendance_check.repository.AttendanceCheckRepository;
+import io.mohajistudio.mohagym.web.dto.AttendanceCheckDTO;
+import io.mohajistudio.mohagym.repository.AttendanceCheckRepository;
 import io.mohajistudio.mohagym.entity.AttendanceCheck;
 import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
 @Service
-public class AttendanceCheckService {
+public class AttendanceCheckServiceImpl implements AttendanceCheckService{
     private final MemberRepository memberRepository;
     private final AttendanceCheckRepository attendanceCheckRepository;
 
-    public AttendanceCheckService(MemberRepository memberRepository, AttendanceCheckRepository attendanceCheckRepository) {
+    public AttendanceCheckServiceImpl(MemberRepository memberRepository, AttendanceCheckRepository attendanceCheckRepository) {
         this.memberRepository = memberRepository;
         this.attendanceCheckRepository = attendanceCheckRepository;
     }
 
-    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long id) {
-        Optional<Member> memberEntity = memberRepository.findById(id);
+        public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long memberId) {
+        Optional<Member> memberEntity = memberRepository.findById(memberId);
         Map<String, Object> response = new HashMap<>();
         if (memberEntity.isPresent()) {
             Member member = memberEntity.get();
@@ -49,27 +49,28 @@ public class AttendanceCheckService {
         }
     }
 
-    @ResponseBody
-    public ResponseEntity<List<CheckedMemberDTO>> getAttendance(Long memberId, int year, int month) {
+
+
+    @Override
+    public ResponseEntity<Page<AttendanceCheckDTO>> getAttendance(Long memberId, int year, int month, Pageable pageable) {
         Optional<Member> memberEntity = memberRepository.findById(memberId);
         if (memberEntity.isPresent()) {
             LocalDateTime startDateTime = LocalDateTime.of(year, month, 1, 0, 0);
             LocalDateTime endDateTime = startDateTime.plusMonths(1).minusNanos(1);
 
-            List<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(memberId, startDateTime, endDateTime);
+            Page<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(memberId, startDateTime, endDateTime, pageable);
 
+            Page<AttendanceCheckDTO> attendanceCheckDTOPage = attendanceCheckTimes.map(attendanceCheckTime -> {
+                AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
+                attendanceCheckDTO.setAttendanceCheckedId(attendanceCheckTime.getId());
+                attendanceCheckDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
+                return attendanceCheckDTO;
+            });
 
-            List<CheckedMemberDTO> checkedMemberDTOList = new ArrayList<>();
-            for (AttendanceCheck attendanceCheckTime : attendanceCheckTimes) {
-                CheckedMemberDTO checkedMemberDTO = new CheckedMemberDTO();
-                checkedMemberDTO.setMemberId(memberId);
-                checkedMemberDTO.setCreatedAt(attendanceCheckTime.getCreatedAt());
-                checkedMemberDTOList.add(checkedMemberDTO);
-            }
-
-            return ResponseEntity.ok(checkedMemberDTOList);
+            return ResponseEntity.ok(attendanceCheckDTOPage);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
