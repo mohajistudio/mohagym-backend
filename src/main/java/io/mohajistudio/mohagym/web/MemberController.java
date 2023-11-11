@@ -111,7 +111,6 @@ public class MemberController {
     public ResponseEntity<List<responseDto.Member>> getAllMembers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) String name
     //localhost:8080/members?page=0&size=20 과 동일
     ) {
-
         if (name != null) {
             Page<responseDto.Member> membersPage = memberService.getMemberByName(page, size,name);
             List<responseDto.Member> members =  membersPage.getContent();
@@ -121,7 +120,6 @@ public class MemberController {
             List<responseDto.Member> members =  membersPage.getContent();
             return ResponseEntity.ok(members);
         }
-
     }
 
 
@@ -183,6 +181,4 @@ public class MemberController {
                 .build();
         return cookie;
     }
-
-
 }

@@ -1,7 +1,6 @@
 package io.mohajistudio.mohagym.provider.service;
 
 
-import io.mohajistudio.mohagym.entity.Member;
 import io.mohajistudio.mohagym.entity.MemberProfile;
 import io.mohajistudio.mohagym.web.dto.*;
 import org.springframework.data.domain.Page;
