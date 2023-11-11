@@ -21,15 +21,16 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     //요청이 처리되기 전에 실행되는 메서드
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
-        if(token.isPresent()){ //토큰이 있다면
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            if(jwtAuthToken.validate()){ //유효하면
-                return true;
-            }
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
-        }
-        throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+//        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+//        if(token.isPresent()){ //토큰이 있다면
+//            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+//            if(jwtAuthToken.validate()){ //유효하면
+//                return true;
+//            }
+//            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+//        }
+//        throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        return true;
     }
 }
 

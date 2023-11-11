@@ -24,66 +24,30 @@ public class AttendanceCheckServiceImpl implements AttendanceCheckService{
         this.attendanceCheckRepository = attendanceCheckRepository;
     }
 
-    //    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long id) {
-//        Optional<Member> memberEntity = memberRepository.findById(id);
-//        Map<String, Object> response = new HashMap<>();
-//        if (memberEntity.isPresent()) {
-//            Member member = memberEntity.get();
-//
-//            AttendanceCheck attendanceCheck = new AttendanceCheck();
-//            attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-//            attendanceCheck.setMember(member);
-//
-//            AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
-//
-//            AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
-//            attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
-//            attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
-//
-//            response.put("status", "success");
-//            response.put("created at", savedAttendanceCheckTime.getCreatedAt());
-//
-//            return ResponseEntity.ok(attendanceCheckDTO);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-    @Override
-    public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long memberId, Long attendanceCheckId) {
+        public ResponseEntity<AttendanceCheckDTO> attendanceCheck(Long memberId) {
         Optional<Member> memberEntity = memberRepository.findById(memberId);
         Map<String, Object> response = new HashMap<>();
-
         if (memberEntity.isPresent()) {
             Member member = memberEntity.get();
 
-            // 여기서 출석체크 ID와 멤버 ID를 비교
-            if (attendanceCheckId.equals(member.getId())) {
-                AttendanceCheck attendanceCheck = new AttendanceCheck();
-                attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-                attendanceCheck.setMember(member);
+            AttendanceCheck attendanceCheck = new AttendanceCheck();
+            attendanceCheck.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+            attendanceCheck.setMember(member);
 
-                AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
+            AttendanceCheck savedAttendanceCheckTime = attendanceCheckRepository.save(attendanceCheck);
 
-                AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
-                attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
-                attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
+            AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
+            attendanceCheckDTO.setAttendanceCheckedId(attendanceCheck.getId());
+            attendanceCheckDTO.setCreatedAt(savedAttendanceCheckTime.getCreatedAt());
 
-                response.put("status", "success");
-                response.put("created at", savedAttendanceCheckTime.getCreatedAt());
+            response.put("status", "success");
+            response.put("created at", savedAttendanceCheckTime.getCreatedAt());
 
-                return ResponseEntity.ok(attendanceCheckDTO);
-            } else {
-                // 출석체크 ID와 멤버 ID가 일치하지 않는 경우 오류 응답 반환
-                response.put("status", "error");
-                response.put("message", "AttendanceCheck ID does not match Member ID");
-                return ResponseEntity.badRequest().body((AttendanceCheckDTO) response);
-            }
+            return ResponseEntity.ok(attendanceCheckDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-
 
 
 
