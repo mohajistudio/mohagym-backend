@@ -52,13 +52,13 @@ public class AttendanceCheckServiceImpl implements AttendanceCheckService{
 
 
     @Override
-    public ResponseEntity<Page<AttendanceCheckDTO>> getAttendance(Long id, int year, int month, Pageable pageable) {
-        Optional<Member> memberEntity = memberRepository.findById(id);
+    public ResponseEntity<Page<AttendanceCheckDTO>> getAttendance(Long memberId, int year, int month, Pageable pageable) {
+        Optional<Member> memberEntity = memberRepository.findById(memberId);
         if (memberEntity.isPresent()) {
             LocalDateTime startDateTime = LocalDateTime.of(year, month, 1, 0, 0);
             LocalDateTime endDateTime = startDateTime.plusMonths(1).minusNanos(1);
 
-            Page<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(id, startDateTime, endDateTime, pageable);
+            Page<AttendanceCheck> attendanceCheckTimes = attendanceCheckRepository.findByMemberIdAndCreatedAtBetween(memberId, startDateTime, endDateTime, pageable);
 
             Page<AttendanceCheckDTO> attendanceCheckDTOPage = attendanceCheckTimes.map(attendanceCheckTime -> {
                 AttendanceCheckDTO attendanceCheckDTO = new AttendanceCheckDTO();
