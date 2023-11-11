@@ -31,9 +31,10 @@ public class NoticeService {
 
 
     // list all boards
-    public List<Notice> listAllBoards() {
-        return noticeRepository.findAll();
+    public Page<Notice> listAllNotices(Pageable pagable) {
+        return noticeRepository.findAll(pagable);
     }
+
 
     // get board by id
     public ResponseEntity<Notice> getBoardById(@PathVariable Integer id) {
@@ -69,9 +70,5 @@ public class NoticeService {
         return ResponseEntity.ok(response);
     }
 
-    // list all boards with paging
-    public Page<Notice> listAllBoards(Pageable pageable) {
-        return noticeRepository.findAll(pageable);
-    }
 
 }
