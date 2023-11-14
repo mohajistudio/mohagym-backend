@@ -69,5 +69,4 @@ public class NoticeService {
         return ResponseEntity.ok(response);
     }
 
-
 }
