@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "notices")
 @EqualsAndHashCode(callSuper = false)
 public class Notice extends BaseEntity {
-<<<<<<< HEAD
+
     @Column(name = "title")
     private String title;
 
@@ -21,15 +21,9 @@ public class Notice extends BaseEntity {
 
     @Column(name = "view_cnt")
     private Integer viewCnt;
-=======
-    private String title;
-    private String body;
->>>>>>> 48f6ce92ae29b6579ed4ebfd551ab897cb111072
+
 
     @ManyToOne(optional = false)
     private Member author;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 48f6ce92ae29b6579ed4ebfd551ab897cb111072
